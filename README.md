@@ -41,8 +41,6 @@ You need to click these and accept the certificates to connect properly with you
 -   [Reticulum](https://hubs.local:4000)
 -   [Coturn](https://hubs.local:5349)
 
-### Credits
-
 
 ### Credits
 
