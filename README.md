@@ -45,5 +45,5 @@ You need to click these and accept the certificates to connect properly with you
 ### Credits
 
 #### WebRTC Coturn server code:
-- [@keianhzo] (https://www.github.com/keianhzo)
+- [@keianhzo](https://www.github.com/keianhzo)
 https://github.com/mozilla/hubs-compose/pull/16
