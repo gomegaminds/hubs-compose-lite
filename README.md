@@ -29,8 +29,8 @@ It does not concern itself with hosting or deploying the hubs frontend (mozilla/
 
 ### Orchestration
 
--   Start containers with "mutagen-compose up"
--   Stop containers with "mutagen-compose down"
+-   Start containers with "docker-compose up"
+-   Stop and clean up with "docker-compose down"
 
 ### Self-Signed Certificates
 
