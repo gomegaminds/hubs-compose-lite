@@ -5,3 +5,6 @@
 !files/dev-reticulum.conf
 !services/reticulum/priv/dev-ssl.cert
 !services/reticulum/priv/dev-ssl.key
+!files/coturn/entrypoint.sh
+!files/coturn/certs/cert.pem
+!files/coturn/certs/key.pem

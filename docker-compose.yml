@@ -7,10 +7,35 @@ services:
       test: ["CMD", "pg_isready"]
     image: "postgres:14-alpine"
     user: postgres
+    ports:
+      - "6432:5432" # Expose different port to host to avoid conflict with existing dbs
+    networks:
+      hubs_network:
     volumes:
       - pgdata:/var/lib/postgresql/data
+  coturn:
+    environment:
+      REALM: ret
+      PSQL: host=db dbname=ret_dev user=postgres password=postgres options='-c search_path=coturn' connect_timeout=30
+      TLS_PORT: 5349
+      MIN_PORT: 50000
+      MAX_PORT: 50050
+    build:
+      context: .
+      dockerfile: dockerfiles/coturn.Dockerfile
+    depends_on:
+      - db
+    volumes:
+      - coturn:/var/lib/coturn
     ports:
-      - "6432:5432" # Avoid conflict with other dbs
+      - "5349:5349"
+        # This should be the same as MIN_PORT MAX_PORT.
+        # You might neeed to increase this number depending on how many clients you are connecting.
+        # (Keep the ports range small to improve container startup time)
+      - "50000-50050:50000-50050"
+      - "50000-50050:50000-50050/udp"
+    networks:
+      hubs_network:
   dialog:
     build:
       context: .
@@ -20,11 +45,21 @@ services:
       HTTPS_CERT_FULLCHAIN: /etc/ssl/fullchain.pem
       HTTPS_CERT_PRIVKEY: /etc/ssl/privkey.pem
       INTERACTIVE: "false"
+      MEDIASOUP_MIN_PORT: 40000
+      MEDIASOUP_MAX_PORT: 40050
+      MEDIASOUP_ANNOUNCED_IP: 10.20.30.12
+    depends_on:
+      - coturn
     ports:
       - "4443:4443"
+      - "40000-40050:40000-40050"
+      - "40000-40050:40000-40050/udp"
     volumes:
       - dialog:/code
     working_dir: /code
+    networks:
+      hubs_network:
+        ipv4_address: 10.20.30.12
   reticulum:
     build:
       context: ./services/reticulum
@@ -46,34 +81,17 @@ services:
     volumes:
       - reticulum:/code
       - retstorage:/code/storage/dev
+    networks:
+      hubs_network:
 networks:
-  default:
-    name: mozilla-hubs-lite
+  hubs_network:
+    name: hubs
+    ipam:
+      config:
+        - subnet: 10.20.30.0/24
 volumes:
+  coturn:
   dialog:
   pgdata:
   reticulum:
   retstorage:
-x-mutagen:
-  sync:
-    defaults:
-      ignore:
-        paths:
-          - ".DS_Store"
-          - ".gitignore"
-          - "/certs/"
-          - "/node_modules/"
-          - "package-lock.sha512"
-        vcs: true
-      mode: "two-way-resolved"
-    dialog:
-      alpha: ./services/dialog
-      beta: "volume://dialog"
-    reticulum:
-      alpha: ./services/reticulum
-      beta: "volume://reticulum"
-      ignore:
-        paths:
-          - "/_build/"
-          - "/bin/"
-          - "/storage/"

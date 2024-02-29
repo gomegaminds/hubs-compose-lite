@@ -34,8 +34,18 @@ It does not concern itself with hosting or deploying the hubs frontend (mozilla/
 
 ### Self-Signed Certificates
 
-You need to click these to connect properly with your custom client:
+You need to click these and accept the certificates to connect properly with your custom client on a local machine:
 
 -   [Proxy](https://hubs-proxy.local:4000)
 -   [Dialog](https://hubs.local:4443)
 -   [Reticulum](https://hubs.local:4000)
+-   [Coturn](https://hubs.local:5349)
+
+### Credits
+
+
+### Credits
+
+#### WebRTC Coturn server code:
+- [@keianhzo] (https://www.github.com/keianhzo)
+https://github.com/mozilla/hubs-compose/pull/16
