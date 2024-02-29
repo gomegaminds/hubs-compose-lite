@@ -9,6 +9,8 @@ services:
     user: postgres
     volumes:
       - pgdata:/var/lib/postgresql/data
+    ports:
+      - "6432:5432" # Avoid conflict with other dbs
   dialog:
     build:
       context: .
@@ -23,54 +25,6 @@ services:
     volumes:
       - dialog:/code
     working_dir: /code
-  hubs-admin:
-    build:
-      context: .
-      dockerfile: dockerfiles/hubs.Dockerfile
-    command: npm run local
-    environment:
-      INTERNAL_HOSTNAME: hubs-admin
-    healthcheck:
-      test: ["CMD", "curl", "-fk", "https://localhost:8989/admin.html"]
-    platform: linux/amd64
-    ports:
-      - "8989:8989"
-    volumes:
-      - hubs:/code
-    working_dir: /code/admin
-  hubs-client:
-    build:
-      context: .
-      dockerfile: dockerfiles/hubs.Dockerfile
-    command: npm run local
-    environment:
-      INTERNAL_HOSTNAME: hubs-client
-    healthcheck:
-      start_period: 3m30s
-      test: ["CMD", "curl", "-fk", "https://localhost:8080"]
-    platform: linux/amd64
-    ports:
-      - "8080:8080"
-    volumes:
-      - hubs:/code
-    working_dir: /code
-  hubs-storybook:
-    build:
-      context: .
-      dockerfile: dockerfiles/hubs.Dockerfile
-    command: npm run storybook
-    healthcheck:
-      test: ["CMD", "curl", "-fk", "http://hubs.local:6006"]
-    platform: linux/amd64
-    ports:
-      - "6006:6006"
-    volumes:
-      - hubs:/code
-    working_dir: /code
-  postgrest:
-    build:
-      context: .
-      dockerfile: dockerfiles/postgrest.Dockerfile
   reticulum:
     build:
       context: ./services/reticulum
@@ -92,28 +46,14 @@ services:
     volumes:
       - reticulum:/code
       - retstorage:/code/storage/dev
-  spoke:
-    build:
-      context: .
-      dockerfile: dockerfiles/spoke.Dockerfile
-    environment:
-      CORS_PROXY_SERVER: "hubs-proxy.local:4000"
-      INTERNAL_HOSTNAME: spoke
-    platform: linux/amd64
-    ports:
-      - "9090:9090"
-    volumes:
-      - spoke:/code
 networks:
   default:
-    name: mozilla-hubs
+    name: mozilla-hubs-lite
 volumes:
   dialog:
-  hubs:
   pgdata:
   reticulum:
   retstorage:
-  spoke:
 x-mutagen:
   sync:
     defaults:
@@ -129,13 +69,6 @@ x-mutagen:
     dialog:
       alpha: ./services/dialog
       beta: "volume://dialog"
-    hubs:
-      alpha: ./services/hubs
-      beta: "volume://hubs"
-      ignore:
-        paths:
-          - "/admin/certs/"
-          - "/admin/node_modules/"
     reticulum:
       alpha: ./services/reticulum
       beta: "volume://reticulum"
@@ -144,6 +77,3 @@ x-mutagen:
           - "/_build/"
           - "/bin/"
           - "/storage/"
-    spoke:
-      alpha: ./services/spoke
-      beta: "volume://spoke"
