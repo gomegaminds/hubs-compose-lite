@@ -2,13 +2,13 @@
 
 Some projects based on Mozilla Hubs only need a basic reticulum backend with WebRTC support.
 
-hubs-compose-lite is a minimal setup for local testing of the following Hubs-related services:
+hubs-compose-lite is a minimal setup for local testing, learning and experimentation of the following Hubs-related services:
 
 -   Dialog
 -   Reticulum
 -   Coturn
 
-It does not concern itself with hosting or deploying the hubs frontend (mozilla/hubs).
+It does not concern itself with hosting or deploying the hubs frontend (mozilla/hubs) or any of the other services.
 
 ### Initial Setup
 
